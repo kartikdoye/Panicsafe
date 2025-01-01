@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            height: 100%;
+            font-family: 'Times New Roman', serif;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 90%;
+            max-width: 600px;
+            z-index: 1;
+        }
+
+        .title {
+            font-size: 4rem;
+            margin-bottom: 2.5rem;
+            color: #000;
+            font-family: 'Times New Roman', serif;
+            cursor: pointer;
+        }
+
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .timer span {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .timer span label {
+            font-size: 1.2rem;
+            color: #000;
+        }
+
+        .timer span input {
+            width: 100px;
+            font-size: 2.5rem;
+            text-align: center;
+            border: none;
+            background-color: transparent;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .start-btn {
+            font-size: 1.5rem;
+            color: #000;
+            background-color: transparent;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .start-btn:hover {
+            text-decoration: none;
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: auto;
+            padding-bottom: 1rem;
+        }
+
+        .links a {
+            font-size: 1.2rem;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .links a:hover {
+            text-decoration: underline;
+        }
+
+        video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease-in-out;
+            z-index: 0;
+        }
+
+        .video-visible {
+            opacity: 1;
+        }
+
+        #background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('Untitled design (1).jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 1;
+            transition: opacity 2s ease-in-out;
+            z-index: 0;
+        }
+
+        .map-container {
+            display: none;
+            margin-top: 20px;
+            width: 600%;
+            height: 80%;
+            z-index: 10;
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 1.5rem;
+            color: #585858;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 11;
+        }
+    </style>
+    <script>
+        let countdown;
+        const alarm = new Audio('eas-alarm-phone-alarm-262882.mp3'); // Load the alarm sound.
+
+        function startTimer() {
+            const hours = parseInt(document.getElementById('hours').value) || 0;
+            const minutes = parseInt(document.getElementById('minutes').value) || 0;
+            const seconds = parseInt(document.getElementById('seconds').value) || 0;
+
+            let totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
+            if (totalSeconds > 0) {
+                const display = document.querySelector('.title');
+                display.textContent = "Safe.";
+
+                const bgImage = document.getElementById('background-image');
+                bgImage.style.opacity = 0;
+
+                clearInterval(countdown);
+
+                countdown = setInterval(() => {
+                    const hrs = Math.floor(totalSeconds / 3600);
+                    const mins = Math.floor((totalSeconds % 3600) / 60);
+                    const secs = totalSeconds % 60;
+
+                    document.getElementById('hours').value = hrs;
+                    document.getElementById('minutes').value = mins;
+                    document.getElementById('seconds').value = secs;
+
+                    if (totalSeconds <= 0) {
+                        clearInterval(countdown);
+                        changeVideo();
+                    }
+
+                    totalSeconds--;
+                }, 1000);
+            }
+        }
+
+        function changeVideo() {
+            const video1 = document.getElementById('background-video-1');
+            const video2 = document.getElementById('background-video-2');
+
+            video1.classList.remove('video-visible');
+            video2.classList.add('video-visible');
+
+            alarm.play(); // Play the alarm sound.
+        }
+
+        function handleSafeClick() {
+            startTimer();
+            const video1 = document.getElementById('background-video-1');
+            video1.classList.add('video-visible');
+        }
+
+        function checkoutEarly() {
+            const display = document.querySelector('.title');
+            display.textContent = "You have successfully checked out!";
+            clearInterval(countdown);
+        }
+
+        function toggleMap() {
+            document.querySelector('.container').classList.add('hidden');
+            document.querySelector('.map-container').style.display = 'block';
+        }
+
+        function backToMain() {
+            document.querySelector('.container').classList.remove('hidden');
+            document.querySelector('.map-container').style.display = 'none';
+        }
+    </script>
+</head>
+<body>
+    <div id="background-image"></div>
+
+    <video id="background-video-1" autoplay muted loop>
+        <source src="PanicSafe.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <video id="background-video-2" autoplay muted loop>
+        <source src="PanicSafe (1).mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <div class="container">
+        <div class="title" onclick="handleSafeClick()">Safe.</div>
+        <div class="timer">
+            <span>
+                <input type="number" id="hours" min="0" value="1">
+                <label>hr.</label>
+            </span>
+            <span>
+                <input type="number" id="minutes" min="0" max="59" value="23">
+                <label>min.</label>
+            </span>
+            <span>
+                <input type="number" id="seconds" min="0" max="59" value="45">
+                <label>sec.</label>
+            </span>
+        </div>
+        <button class="start-btn" onclick="checkoutEarly()">Checkout early</button>
+        <div class="links">
+            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=kartik.doye2005@gmail.com&su=I%20am%20safe&body=I%20am%20sending%20this%20mail%20to%20let%20you%20know%20that%20I%20am%20currently%20using%20the%20Panic%20Safe%20system%20for%20my%20safety.%20It%20is%20designed%20to%20ensure%20that%20I%20remain%20secure%20during%20potentially%20risky%20situations.%20The%20system%20includes%20a%20timer%20that%20allows%20me%20to%20notify%20you%20in%20case%20of%20emergencies%20or%20unforeseen%20incidents.%20Please%20rest%20assured%20that%20I%20will%20notify%20you%20promptly%20if%20there%20is%20any%20danger.%20Meanwhile%2C%20I%20am%20sharing%20this%20to%20keep%20you%20informed%20about%20my%20whereabouts%20and%20safety%20measures.%0A%0AHere%20is%20my%20current%20location%3A%20https%3A%2F%2Fwww.google.com%2Fmaps%2Fembed%3Fpb%3D!1m18!1m12!1m3!1d15569.765356288786!2d77.45747380933913!3d12.68459188576514!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae5b598319a6a1%3A0xea8a669de1411fca!2sHarohalli%2C%20Karnataka%20562112!5e0!3m2!1sen!2sin!4v1733955373335!5m2!1sen%2Fin" target="_blank">Mail emergency contact</a>
+            <a href="javascript:void(0);" onclick="toggleMap()">Your realtime location</a>
+            <a href="panic-button.html">Panic Button</a>
+        </div>
+    </div>
+
+    <div id="map-container" class="map-container">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d71917.82852536227!2d77.42604341846209!3d12.666542456596884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae439988d9a405%3A0x9a4892007871393f!2z4LK44LK_LuCyoeCyvy7gsrjgs4jgsq7gsrDgs40gQ0RTSU1FUiBEciBDaGFuZHJhbW1hIERheWFuYW5kYSBTYWdhciBpbnN0aXR1dGUgb2YgTWVkaWNhbCBFZHVjYXRpb24gYW5kIFJlc2VhcmNo!5e0!3m2!1sen!2sin!4v1733982695300!5m2!1sen!2sin" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <button class="back-btn" onclick="backToMain()">Back</button>
+    </div>
+</body>
+</html>
